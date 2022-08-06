@@ -3,7 +3,7 @@ certifi==2022.6.15
 charset-normalizer==2.1.0
 Django==3.1
 idna==3.3
-numpy==1.23.1
+numpy==1.21.1
 Pillow==9.2.0
 pytz==2022.1
 rdkit==2022.3.4
