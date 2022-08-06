@@ -6,7 +6,7 @@ certifi==2021.10.8
 charset-normalizer==2.0.7
 colorama==0.4.3
 distlib==0.3.5
-Django==4.0.2
+Django==3.1
 django-simple-sso==1.1.0
 filelock==3.7.1
 future==0.16.0
