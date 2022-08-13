@@ -24,7 +24,8 @@ def Pharm_Toys(req):
         #print(estimates)
         molsvg = getSVG(req.GET['smiles'], estimates = estimates, showanswers=(req.GET['desccheck']=="true"), maptag=req.GET['maptag'])
         invertmolsvg = getRandomMap(req.GET['smiles'], maptag=req.GET['maptag'])
-        return JsonResponse({'molsvg': molsvg, 'invertmolsvg': invertmolsvg, 'estimates': estimates, 'props': props, 'fglist': fglist}, status=200)
+        rotbs = getRotatableBonds(m)
+        return JsonResponse({'molsvg': molsvg, 'invertmolsvg': invertmolsvg, 'estimates': estimates, 'props': props, 'rotbs': rotbs, 'fglist': fglist}, status=200)
     return render(req, "Pharmaceutics/base.html")
 
 

@@ -1,3 +1,4 @@
+from re import M
 import urllib
 
 from rdkit import Chem
@@ -68,7 +69,7 @@ IDgroups = {
     "Tetrazole": "c1nnnn1",
     "NSAA": "[$([NX3,NX4+][CX4H]([*])[CX3](=[OX1])[O,N]);!$([$([$([NX3H,NX4H2+]),$([NX3](C)(C)(C))]1[CX4H]([CH2][CH2][CH2]1)[CX3](=[OX1])[OX2H,OX1-,N]),$([$([NX3H2,NX4H3+]),$([NX3H](C)(C))][CX4H2][CX3](=[OX1])[OX2H,OX1-,N]),$([$([NX3H2,NX4H3+]),$([NX3H](C)(C))][CX4H]([$([CH3X4]),$([CH2X4][CH2X4][CH2X4][NHX3][CH0X3](=[NH2X3+,NHX2+0])[NH2X3]),$([CH2X4][CX3](=[OX1])[NX3H2]),$([CH2X4][CX3](=[OX1])[OH0-,OH]),$([CH2X4][SX2H,SX1H0-]),$([CH2X4][CH2X4][CX3](=[OX1])[OH0-,OH]),$([CH2X4][#6X3]1:[$([#7X3H+,#7X2H0+0]:[#6X3H]:[#7X3H]),$([#7X3H])]:[#6X3H]:[$([#7X3H+,#7X2H0+0]:[#6X3H]:[#7X3H]),$([#7X3H])]:[#6X3H]1),$([CHX4]([CH3X4])[CH2X4][CH3X4]),$([CH2X4][CHX4]([CH3X4])[CH3X4]),$([CH2X4][CH2X4][CH2X4][CH2X4][NX4+,NX3+0]),$([CH2X4][CH2X4][SX2][CH3X4]),$([CH2X4][cX3]1[cX3H][cX3H][cX3H][cX3H][cX3H]1),$([CH2X4][OX2H]),$([CHX4]([CH3X4])[OX2H]),$([CH2X4][cX3]1[cX3H][nX3H][cX3]2[cX3H][cX3H][cX3H][cX3H][cX3]12),$([CH2X4][cX3]1[cX3H][cX3H][cX3]([OHX2,OH0X1-])[cX3H][cX3H]1),$([CHX4]([CH3X4])[CH3X4])])[CX3](=[OX1])[OX2H,OX1-,N])])]",
     #"SAA": "[$([CH3X4]),$([CH2X4][CH2X4][CH2X4][NHX3][CH0X3](=[NH2X3+,NHX2+0])[NH2X3]),$([CH2X4][CX3](=[OX1])[NX3H2]),$([CH2X4][CX3](=[OX1])[OH0-,OH]),$([CH2X4][SX2H,SX1H0-]),$([CH2X4][CH2X4][CX3](=[OX1])[OH0-,OH]),$([CH2X4][#6X3]1:[$([#7X3H+,#7X2H0+0]:[#6X3H]:[#7X3H]),$([#7X3H])]:[#6X3H]:[$([#7X3H+,#7X2H0+0]:[#6X3H]:[#7X3H]),$([#7X3H])]:[#6X3H]1),$([CHX4]([CH3X4])[CH2X4][CH3X4]),$([CH2X4][CHX4]([CH3X4])[CH3X4]),$([CH2X4][CH2X4][CH2X4][CH2X4][NX4+,NX3+0]),$([CH2X4][CH2X4][SX2][CH3X4]),$([CH2X4][cX3]1[cX3H][cX3H][cX3H][cX3H][cX3H]1),$([CH2X4][OX2H]),$([CHX4]([CH3X4])[OX2H]),$([CH2X4][cX3]1[cX3H][nX3H][cX3]2[cX3H][cX3H][cX3H][cX3H][cX3]12),$([CH2X4][cX3]1[cX3H][cX3H][cX3]([OHX2,OH0X1-])[cX3H][cX3H]1),$([CHX4]([CH3X4])[CH3X4])]"
-    "GAA": "[NX3,NX4+][CX4H]([*])[CX3](=[OX1])[O,N]",
+    #"GAA": "[NX3,NX4+][CX4H]([*])[CX3](=[OX1])[O,N]",
 }
 
 
@@ -433,16 +434,30 @@ def SMILESToName(SMILES):
 def getProperties(m):
     #MW, LogP, TPSA, HBD, HBA, RotB
     properties = {
-        "molw": round(Chem.Descriptors.ExactMolWt(m), 3),
-        "logp": round(Chem.Crippen.MolLogP(m), 3),
-        "tpsa": Chem.MolSurf.TPSA(m),
-        "hbd": Chem.Lipinski.NumHDonors(m),
-        "hba": Chem.Lipinski.NOCount(m),
-        "rotb": Chem.Lipinski.NumRotatableBonds(m)
+        "Molecular Weight": round(Chem.Descriptors.ExactMolWt(m), 3),
+        "Estimated LogP": round(Chem.Crippen.MolLogP(m), 3),
+        "Total Polar Surface Area": Chem.MolSurf.TPSA(m),
+        "Hydrogen Bond Donors": Chem.Lipinski.NumHDonors(m),
+        "Hydrogen Bond Acceptors": Chem.Lipinski.NOCount(m),
+        "Rotatable Bonds": Chem.Lipinski.NumRotatableBonds(m)
     }
 
     print(properties)
     return properties
+
+def getRotatableBonds(m):
+    mol = m
+    bonds = []
+    
+    RotatableBond = Chem.MolFromSmarts('[!$(*#*)&!D1]-&!@[!$(*#*)&!D1]')
+    matches = mol.GetSubstructMatches(RotatableBond)
+    print("THESE ARE ROTB TUPS:")
+    print(matches)
+    for tup in matches:
+        bonds.append((m.GetBondBetweenAtoms(tup[0], tup[1])).GetIdx())
+    print("THESE ARE ROTB BONDS PASSED:")
+    print(bonds)
+    return bonds
 
 def getMap(m, type, d):
     if type == "logp":
@@ -465,7 +480,7 @@ def getSVG(urlsmiles, maptag = "logp", showanswers = True, estimates = []): #tak
     m = Chem.MolFromSmiles(smiles)
     if showanswers:
         for idx, e in enumerate(estimates):
-            m.GetAtomWithIdx(e[1]).SetProp("atomNote", "Group " + str(idx + 1) +  "\nEst. pKa = " + str(e[2]))
+            m.GetAtomWithIdx(e[0]).SetProp("atomNote", "Group " + str(idx + 1) +  "\nEst. pKa = " + str(e[1]))
     d = rdMolDraw2D.MolDraw2DSVG(650, 650) # or MolDraw2DSVG to get SVGs
         # if overlay != 'None':
         #     e.getMap(mol, overlay, d)

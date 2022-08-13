@@ -55,6 +55,9 @@
     .fg.solved{
         background: green;
     }
+    .rotbquestion.solved{
+        background: green;
+    }
     #questionbox1.solved{
         background-color: lightgreen;
     }
@@ -217,7 +220,7 @@
                 },
                 success: function(response) {
                     if(document.getElementById("mapmodecheck").checked){
-                        document.getElementById('mapbox').innerHTML += `<h2 class='maptext'>Only 2% of people can tell which one is the real ${$("#maptag option:selected").text().toLowerCase()} map!</h2><br>`
+                        document.getElementById('mapbox').innerHTML += `<h2 class='maptext'>Select the real ${$("#maptag option:selected").text().toLowerCase()} map.</h2><br>`
                         insertSVGs(response.molsvg, response.invertmolsvg)
                     }
                     else{
@@ -229,12 +232,15 @@
                         $("#estimates").append('<li>' + pkaquestion(estimates[i]))
                         $("#estimates").append('<li>' + `<button type="button" class="pkahint" data-subtracts='${estimates[i][3]}'> ^ Show Hint ^ </button>`)  
                     }
+                    
                     fgs = response.fglist
                     fgs.forEach(function(pair) {
                         $("#estimates").append('<li>' + fgquestion(pair))
-                    }
+                    })
 
-                    )
+                    rotbs = response.rotbs
+                    $("#estimates").append('<li>' + rotbquestion(rotbs))
+
                     createListeners();
 
                     props = JSON.parse(response.props)
@@ -286,6 +292,7 @@
                 //el.addEventListener("mousemove",  move);
             })
 
+            
             let checks = Array.from(document.querySelectorAll('.pkaquestion'));
             checks.forEach(function(ch) {
                 ch.addEventListener("keydown", checkanswer)
@@ -300,8 +307,19 @@
                 ch.addEventListener("click", fgselect)
                 $(ch).data('selectedAtoms', [])
             })
-
             
+            $('.rotbquestion').on("click", rotbselect)
+            $('.rotbquestion').data('selectedBonds', [])
+            let bonds = Array.from(document.querySelectorAll('svg .bond-selector'));
+        
+            // add event listeners
+            bonds.forEach(function(el) {
+                //el.addEventListener("touchstart", start);
+                el.style.strokeWidth = 10
+                el.addEventListener("mousedown",  bondclick);
+                //el.addEventListener("touchmove",  move);
+                //el.addEventListener("mousemove",  move);
+            })
         }
         
 
@@ -336,16 +354,18 @@
 
             }
             
-            fgbut.data('selectedAtoms', activeatoms)
+            fgbut.data('selectedAtoms', activeatoms.sort((a, b) => a - b))
 
-            console.log(i);
-            // console.log(fgbut.data('selectedAtoms'));
-
+            // console.log(i);
+            // //console.log(fgbut.data('selectedAtoms'));
+            // console.log("Sort Selected Atoms:")
             // console.log(fgbut.data('selectedAtoms').sort((a, b) => a - b))
+            // console.log("Selected atoms:")
+            // console.log(fgbut.data('selectedAtoms'));
             
             console.log(answers)
 
-            drawSelection(activeatoms)
+            drawSelectedAtoms(activeatoms)
 
             if(activeatoms.toString() === answers.toString()){
                 fgbut.removeClass("active").addClass("solved")
@@ -355,16 +375,59 @@
 
             // just an example
         }
-        
+        function bondclick(e){
+
+            let t = e.currentTarget
+
+            let i = parseInt(t.classList[1].replace("bond-", ""))
+            
+            rotbbut = $(document).find(".rotbquestion.active")
+            console.log(rotbbut)       
+            
+            
+            answers = rotbbut.data('answers')
+            console.log("answers:")
+            console.log(answers)
+
+            activebonds = rotbbut.data('selectedBonds').sort((a, b) => a - b)
+            console.log(activebonds)
+            
+            if(activebonds.includes(i)){
+                activebonds.splice(activebonds.indexOf(i), 1)
+                t.style.strokeOpacity = 0
+                t.style.fillOpacity = 0
+            }
+            else{
+                activebonds.push(i)
+
+                strokecolor = answers.includes(i)? "green":"red"
+                t.setAttribute("r", 15)
+                t.style.stroke = strokecolor
+
+            }
+            
+            rotbbut.data('selectedBonds', activebonds.sort((a, b) => a - b))            
+            console.log(answers)
+            drawSelectedBonds(activebonds)
+
+            if(activebonds.toString() === answers.toString()){
+                rotbbut.removeClass("active").addClass("solved")
+                checkAll()
+                console.log("solved")
+            }
+
+            // just an example
+        }
         function move(e){
             console.log(e.currentTarget);
             // just an example
         }
 
-        function drawSelection(activeatoms){
+        function drawSelectedAtoms(activeatoms){
             let elements = Array.from(document.querySelectorAll('svg .atom-selector'))
+            console.log(elements)
             elements.forEach(function(el) {
-                if(activeatoms.includes(parseInt(el.classList[1].replace("atom-", "")))){
+                if(activeatoms.includes(parseInt(el.classList[1].replace('atom-', "")))){
                     el.style.fillOpacity = 0.5
                     el.style.strokeOpacity = 100
                 }
@@ -375,7 +438,21 @@
 
             })
         }
-        
+        function drawSelectedBonds(activebonds){
+            let elements = Array.from(document.querySelectorAll('svg .bond-selector'))
+            console.log(elements)
+            elements.forEach(function(el) {
+                if(activebonds.includes(parseInt(el.classList[1].replace('bond-', "")))){
+                    el.style.fillOpacity = 0.5
+                    el.style.strokeOpacity = 100
+                }
+                else{
+                    el.style.fillOpacity = 0
+                    el.style.strokeOpacity = 0
+                }
+
+            })
+        }
         function checkanswer(e){
             answer = $(e.currentTarget).data('answer')
             console.log(answer)
@@ -426,8 +503,22 @@
                 e.currentTarget.classList.add('active')
             }
             
-            drawSelection($(e.currentTarget).data('selectedAtoms'))
+            drawSelectedAtoms($(e.currentTarget).data('selectedAtoms'))
         }
+
+        function rotbselect(e){
+            if(e.currentTarget.classList.contains('active')){
+                e.currentTarget.classList.remove('active')
+                return
+            }
+            if(!(e.currentTarget.classList.contains("solved"))){
+                e.currentTarget.classList.add('active')
+            }   
+            drawSelectedBonds($(e.currentTarget).data('selectedBonds'))
+        }
+
+
+
     </script>
 
     <script>// make questions and check all
@@ -445,6 +536,13 @@
             return question
         }
 
+        function rotbquestion(rotbs){
+            console.log(rotbs)
+            rotbs.sort((a, b) => a - b)
+            let question = `<button type="button" class="rotbquestion" data-answers='${JSON.stringify(rotbs)}'> Rotatable Bonds, ${rotbs.length} </button>`;
+            return question
+        }
+
         function checkAll(){
             allSolved = true
             let checks = Array.from(document.querySelectorAll('.pkaquestion'));
@@ -459,7 +557,12 @@
                 allSolved = allSolved && ch.classList.contains("solved")
 
             })
-            
+            let but = Array.from(document.querySelectorAll('.rotbquestion'));
+            buts.forEach(function(ch) {
+
+                allSolved = allSolved && ch.classList.contains("solved")
+
+            })
             if(allSolved){
                 console.log("all Solved")
                 document.getElementById("questionbox1").classList.add("solved")
