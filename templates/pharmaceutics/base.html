@@ -46,6 +46,9 @@
         color: black;
         text-align: center;
     }
+    .map:hover{
+        box-shadow: 3px black;
+    }
     .fg{
         background-color: azure;
     }
@@ -67,6 +70,12 @@
         content: "Good Job!";
         text-align: center;
     }
+    input[type="text"]{
+        text-align: center;
+    }
+    input[type="text"]::placeholder {
+        text-align: center;
+    }
 
 </style>
 </head>
@@ -79,9 +88,16 @@
         <div class="container-fluid teal darken-4" style="height: 5rem;">
             <div class="h-100 text-center display-4 text-white">Pharmaceutics pKa</div>
     </div>
+        
         <br/>
     <form style="text-align:center;" id="drugLookupForm" name="myForm">
-        <label>Drug Search: <input type="text" name="fname" id="fname" /></label>
+        <label for="molecule_dropdown"> Database Drugs </label>
+        <select id="molecule_dropdown">
+            {% for mol in molecule_list %}
+                <option value = {{ mol }}>{{ mol }}</option>
+            {% endfor %}
+
+        <label>Drug Search: <input type="text" name="fname" id="fname" placeholder="Search Drug Name via PubChem, or leave blank to use dropdown"></label>
         <br/>
             <label for="maptag"> Map Overlay </label>
             <select id="maptag" name="maptag">
@@ -137,11 +153,14 @@
                 </div>
 
                 <div id="questionbox2" class="card" style="visibility: hidden; display: block">
-                    <p> "question2"</p>
-                    <input name="answer_choices" label="Diluent" type="radio" id="answer_choice_1"> <label for="answer_choice_1"> Choice 1  </label>       <br/>
-                    <input name="answer_choices" label="Diluent" type="radio" id="answer_choice_2"> <label for="answer_choice_2"> Choice 2 </label>        <br/>
-                    <input name="answer_choices" label="Diluent" type="radio" id="answer_choice_3"> <label for="answer_choice_1"> Choice 3 </label>        <br/>
-                    <input name="answer_choices" label="Diluent" type="radio" id="answer_choice_4"> <label for="answer_choice_1"> Choice 4 </label>        <br/>
+                    <form style="text-align:center;" id="qb2form" name="qb2form">
+                    <p id = "qb2text"> "question2"</p>
+                    <input name="answer_choices" label="Diluent" type="radio" id="answer_choice_1"> <label id = "ac1label" for="answer_choice_1"> Choice 1 </label>       <br/>
+                    <input name="answer_choices" label="Diluent" type="radio" id="answer_choice_2"> <label id = "ac2label" for="answer_choice_2"> Choice 2 </label>        <br/>
+                    <input name="answer_choices" label="Diluent" type="radio" id="answer_choice_3"> <label id = "ac3label" for="answer_choice_3"> Choice 3 </label>        <br/>
+                    <input name="answer_choices" label="Diluent" type="text" id="answer_choice_4" style="visibility:hidden"> <label id = "ac4label" for="answer_choice_4"> Choice 4 </label>        <br/>
+                    <input style="text-align:center;" type="submit" value="Submit" />
+                    </form>
                 </div>
 
                                     <div id="desc" class="initdis">
@@ -172,9 +191,14 @@
 
     <script type="text/javascript"> //3dmol stuff
 
+        document.getElementById('molecule_dropdown').addEventListener('change', handleSubmit)
+
+
+
+
         async function handleSubmit(e){
             questionbox1.style.visibility = 'visible';
-            questionbox2.style.visibility = 'visible';
+            // questionbox2.style.visibility = 'visible';
             document.getElementById("mapbox").innerHTML = ""
             document.getElementById("druginfo").innerHTML = ""
             document.getElementById("estimates").innerHTML = ""
@@ -184,7 +208,8 @@
 
             e.preventDefault();
 
-            const name = document.getElementById('fname').value;
+            const name = document.getElementById('fname').value.length > 0 ? document.getElementById('fname').value : document.getElementById('molecule_dropdown').value;
+            console.log(name)
             const cidurl = `https://pubchem.ncbi.nlm.nih.gov/rest/pug/compound/name/${name}/cids/txt`;
             const smilesurl = `https://pubchem.ncbi.nlm.nih.gov/rest/pug/compound/name/${name}/property/CanonicalSMILES/txt`;
             const cidresponse = await fetch(cidurl);
@@ -220,35 +245,48 @@
                 },
                 success: function(response) {
                     if(document.getElementById("mapmodecheck").checked){
+                        hideQuestionBoxes()
+
                         document.getElementById('mapbox').innerHTML += `<h2 class='maptext'>Select the real ${$("#maptag option:selected").text().toLowerCase()} map.</h2><br>`
                         insertSVGs(response.molsvg, response.invertmolsvg)
+                        createMapListeners()
                     }
                     else{
                         document.getElementById('druginfo').innerHTML += response.molsvg
-                    }
-                    estimates = response.estimates
-                    for (let i = 0; i < estimates.length; i++){
-                        // $("#estimates").append('<li>' + estimates[i]);
-                        $("#estimates").append('<li>' + pkaquestion(estimates[i]))
-                        $("#estimates").append('<li>' + `<button type="button" class="pkahint" data-subtracts='${estimates[i][3]}'> ^ Show Hint ^ </button>`)  
+                        estimates = response.estimates
+                        for (let i = 0; i < estimates.length; i++){
+                            // $("#estimates").append('<li>' + estimates[i]);
+                            $("#estimates").append('<li>' + pkaquestion(estimates[i]))
+                            $("#estimates").append('<li>' + `<button type="button" class="pkahint" data-subtracts='${estimates[i][3]}'> ^ Show Hint ^ </button>`)  
+                        }
+                        
+
+                        fgs = response.fglist
+                        fgs.forEach(function(pair) {
+                            $("#estimates").append('<li>' + fgquestion(pair))
+                        })
+
+                        rotbs = response.rotbs
+                        if(rotbs.length > 0){
+                            $("#estimates").append('<li>' + rotbquestion(rotbs))
+                        }
+                        createListeners();
+
+                        props = JSON.parse(response.props)
+                        console.log(props)
+                        for (const [key, value] of Object.entries(props)) {
+                            $("#properties").append('<li>' + key + ": " + value);
+                            // $("#properties").append('<li>' + propquestion(props[i]))
+                        }
+
+                        if(estimates.length ==0 && response.litpka != 0){
+                            showquestion2(response.litpka, response.reference)
+                        }
+                        else{
+                            writeLitPka(response.litpka, response.reference)
+                        }
                     }
                     
-                    fgs = response.fglist
-                    fgs.forEach(function(pair) {
-                        $("#estimates").append('<li>' + fgquestion(pair))
-                    })
-
-                    rotbs = response.rotbs
-                    $("#estimates").append('<li>' + rotbquestion(rotbs))
-
-                    createListeners();
-
-                    props = JSON.parse(response.props)
-                    console.log(props)
-                    for (const [key, value] of Object.entries(props)) {
-                        $("#properties").append('<li>' + key + ": " + value);
-                        // $("#properties").append('<li>' + propquestion(props[i]))
-                    }
 
 
                 }
@@ -266,19 +304,80 @@
                 console.log("svg then invert")
                 mapbox.innerHTML += svg
                 mapbox.innerHTML += invertsvg
+                svgs = Array(document.querySelectorAll('svg'))
+                $(svgs[0]).addClass('realsvg')
+                $(svgs[1]).addClass('fakesvg')
             }
                 
             else{
                 console.log("invert then normal")
                 mapbox.innerHTML += invertsvg
                 mapbox.innerHTML += svg
+                svgs = Array(document.querySelectorAll('svg'))
+                $(svgs[0]).addClass('fakesvg')
+                $(svgs[1]).addClass('realsvg')
             }
                 
+        }
+        function hideQuestionBoxes(){
+           document.getElementById("questionbox1").style.visibility = "hidden"
+           document.getElementById("questionbox2").style.visibility = "hidden"
         }
 
     </script>
     <script>// select elements
-        
+        function writeLitPka(pka, ref){
+            if(pka != 0){
+                $("#estimates").append("<li id='litpka' style='visibility:hidden'>" + `The literature pka is <a href="https://${ref}"" target="_blank">${pka}</a>.`)
+            }
+            else{
+                $("#estimates").append("<li id='litpka' style='visibility:hidden'>" + `No literature pka found in our database.`)
+            }
+            
+        }
+        function showquestion2(pka, ref){
+            document.getElementById("questionbox2").style.visibility = 'visible'
+            document.getElementById("qb2text").innerText = "There's no apparent carboxylic acid or amine in this molecule. Do you think it's still an acid or a base?"
+
+            if(pka < 7){
+                document.getElementById("answer_choice_1").value = "correct"
+            }else if(pka > 7){
+                document.getElementById("answer_choice_2").value = "correct"
+            }else if(pka == 7){
+                document.getElementById("answer_choice_3").value = "correct"
+            }
+            
+            document.getElementById("ac1label").innerHTML = "Yes, an acid"
+            document.getElementById("ac2label").innerHTML = "Yes, a base"
+            document.getElementById("ac3label").innerHTML = "No"
+            document.getElementById("ac4label").innerHTML = "Guess the pka"
+            if(document.getElementById("answer_choice_1").checked || document.getElementById("answer_choice_2").checked){
+                document.getElementById("answer_choice_4").style.visibility = "visible"
+            }
+            document.getElementById("qb2form").addEventListener('submit', qb2submit);
+            $("#questionbox2").append(`<text id='litpka2' style='visibility:hidden' data-litpka=${pka}>` + `The literature pka is <a href="https://${ref}"" target="_blank">${pka}</a>. `)
+        }
+        function qb2submit(e){
+
+            e.preventDefault();
+            
+            var radios = document.getElementsByName('answer_choices');
+            var val= "";
+            for (var i = 0, length = radios.length; i < length; i++) {
+                if (radios[i].checked) {
+                    val = radios[i].value; 
+                    break;
+                }
+            }
+            if (val == "" ) {
+                alert('Select a choice');
+            } else if (val.match("correct") ) {
+                $("#questionbox2").append(`Nice! You were ${(parseFloat($("#litpka2").data("litpka"))-parseFloat(answer_choice_4.value)).toPrecision(2)} off of the literature value!`);
+                document.getElementById("litpka2").style.visibility = "visible"
+            } else {
+                alert('Answer is wrong');
+            }
+        }
         function createListeners(){
             document.getElementById("questionbox1").classList.remove("solved")
 
@@ -322,6 +421,26 @@
             })
         }
         
+        function createMapListeners(){
+            svgs = Array(document.querySelectorAll('svg'))
+            svgs.forEach(function(svg){
+                $(svg).addClass('map')
+                $(svg).on('click', svgclick)
+            })
+
+        }
+
+        function svgclick(e){
+            svgs = Array(document.querySelectorAll('svg'))
+            svgs.forEach(function(el){
+                $(el).getElementById('rect').style.stroke = 'none'
+                $(el).getElementById('rect').style.strokeWidth = '10px'
+            })
+
+            let svg = e.currentTarget
+            color = $(svg).classList.contains('realsvg')? 'green':'red'
+            svg.getElementById('rect').style.stroke = color
+        }
 
         // event listener functions
 
@@ -523,7 +642,7 @@
 
     <script>// make questions and check all
         function pkaquestion(estArray){
-            let question = `<div class=pkaquestion data-answer='${estArray[1]}'>${estArray[2]} estimated pKa: <input type=text/><text class='check'></text></div>`;
+            let question = `<div class=pkaquestion data-answer='${estArray[1]}'> What's the estimated pka of the ${estArray[2]}? <input type=text/><text class='check'></text></div>`;
            
             console.log(question)
             return question
@@ -532,14 +651,14 @@
             tup = pair[1]
             tup.sort((a, b) => a - b)
             console.log(tup)
-            let question = `<button type="button" class="fg" data-answers='${tup}'> ${pair[0]}, ${tup.length} </button>`;
+            let question = `<button type="button" class="fg" data-answers='${tup}'> Select the ${pair[0]} (${tup.length} atoms) </button>`;
             return question
         }
 
         function rotbquestion(rotbs){
             console.log(rotbs)
             rotbs.sort((a, b) => a - b)
-            let question = `<button type="button" class="rotbquestion" data-answers='${JSON.stringify(rotbs)}'> Rotatable Bonds, ${rotbs.length} </button>`;
+            let question = `<button type="button" class="rotbquestion" data-answers='${JSON.stringify(rotbs)}'> Select the Rotatable Bonds (${rotbs.length} bonds)</button>`;
             return question
         }
 
@@ -552,20 +671,22 @@
 
             })
             let buts = Array.from(document.querySelectorAll('.fg'));
-            buts.forEach(function(ch) {
+            buts.forEach(function(but) {
 
-                allSolved = allSolved && ch.classList.contains("solved")
+                allSolved = allSolved && but.classList.contains("solved")
 
             })
-            let but = Array.from(document.querySelectorAll('.rotbquestion'));
-            buts.forEach(function(ch) {
-
-                allSolved = allSolved && ch.classList.contains("solved")
+            let rotb = Array.from(document.querySelectorAll('.rotbquestion'));
+            rotb.forEach(function(rotb) {
+                console.log("checking rotb question")
+                console.log(rotb.classList)
+                allSolved = allSolved && rotb.classList.contains("solved")
 
             })
             if(allSolved){
                 console.log("all Solved")
                 document.getElementById("questionbox1").classList.add("solved")
+                document.getElementById("questionbox1").querySelector("#litpka").style.visibility = "visible"
             }
             
         }

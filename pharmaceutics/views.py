@@ -4,14 +4,16 @@ from django.http import HttpResponse, JsonResponse
 # from .pharm import svg
 from rdkit import Chem
 from .estimator import *
-
+from .models import *
 import json
 
 def Pharm_Toys(req):
     # print("THIS IS THE REQ", req)
     # context = {"svg": svg}
     # print(req)
-    
+
+    molecule_list = Molecule.objects.all()
+
     if req.headers.get('x-requested-with') == 'XMLHttpRequest':
         # Scraper()
         print("attempting svg get")
@@ -25,8 +27,16 @@ def Pharm_Toys(req):
         molsvg = getSVG(req.GET['smiles'], estimates = estimates, showanswers=(req.GET['desccheck']=="true"), maptag=req.GET['maptag'])
         invertmolsvg = getRandomMap(req.GET['smiles'], maptag=req.GET['maptag'])
         rotbs = getRotatableBonds(m)
-        return JsonResponse({'molsvg': molsvg, 'invertmolsvg': invertmolsvg, 'estimates': estimates, 'props': props, 'rotbs': rotbs, 'fglist': fglist}, status=200)
-    return render(req, "Pharmaceutics/base.html")
+        try:
+            datamol = Molecule.objects.filter(Molecule_Name = req.GET['mol'])[0]
+            litpka = datamol.LiteraturePka
+            reference = datamol.Reference
+        except:
+            print(req.GET['mol'] + " not found in database.")
+            litpka = 0
+            reference = ""
+        return JsonResponse({'molsvg': molsvg, 'invertmolsvg': invertmolsvg, 'estimates': estimates, 'props': props, 'rotbs': rotbs, 'fglist': fglist, 'litpka': litpka, 'reference': reference }, status=200)
+    return render(req, "Pharmaceutics/base.html", {'molecule_list':molecule_list})
 
 
 def pka(req):

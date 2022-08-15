@@ -439,7 +439,7 @@ def getProperties(m):
         "Total Polar Surface Area": Chem.MolSurf.TPSA(m),
         "Hydrogen Bond Donors": Chem.Lipinski.NumHDonors(m),
         "Hydrogen Bond Acceptors": Chem.Lipinski.NOCount(m),
-        "Rotatable Bonds": Chem.Lipinski.NumRotatableBonds(m)
+        "Rotatable Bonds": len(getRotatableBonds(m))
     }
 
     print(properties)
