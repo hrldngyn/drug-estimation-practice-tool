@@ -9,8 +9,18 @@
     <link rel="author" href="https://scholar.google.com/citations?user=gci8pWIAAAAJ&hl=en">
     <meta http-equiv="x-ua-compatible" content="ie=edge">
     {% include 'CoreStaticTemplates/staticCss.html' %}
-    <link rel="stylesheet" href="{% static 'css/custom-homepage.css' %}">
     <style>
+    .tutorial {
+    position: fixed;
+    display: none;
+    min-width: 100%;
+    min-height: 100%;
+    margin: auto;
+    top: 0;
+    background-color: rgba(0,0,0,0.3);
+    z-index: 2;
+    cursor: pointer;
+    }
     [type="checkbox"]:not(:checked), [type="checkbox"]:checked {
         position: relative;
         opacity: 1;
@@ -89,7 +99,11 @@
             <div class="h-100 text-center display-4 text-white">Pharmaceutics pKa</div>
     </div>
         
-        <br/>
+    <input style="text-align:center; margin: 5px;" type="button" value="Help" id="help" onclick="helpdisplay()"/>
+    {% load static %}
+      <img id="tutorial1" class="tutorial" src="{% static 'ebdjango/tutorial1.png' %}" onclick="helpdisplay2()">
+      <img id="tutorial2" class="tutorial" src="{% static 'ebdjango/tutorial2.png' %}" onclick="helpdisplay3()">
+      <img id="tutorial3" class="tutorial" src="{% static 'ebdjango/tutorial3.png' %}" onclick="helpdisplayoff()">
     <form style="text-align:center;" id="drugLookupForm" name="myForm">
         <label for="molecule_dropdown"> Database Drugs </label>
         <select id="molecule_dropdown">
@@ -114,6 +128,16 @@
         <input style="text-align:center;" type="submit" value="Submit" />
     </form>
     <script>
+        function helpdisplay() {
+            document.getElementById("tutorial1").style.display = "block";}   
+        function helpdisplay2() {
+            document.getElementById("tutorial1").style.display = "none";   
+            document.getElementById("tutorial2").style.display = "block";}   
+        function helpdisplay3() {
+            document.getElementById("tutorial2").style.display = "none";   
+            document.getElementById("tutorial3").style.display = "block";} 
+        function helpdisplayoff() {
+            document.getElementById("tutorial3").style.display = "none";}
         viewercheck.addEventListener('change', () => {
         if(viewercheck.checked) {
             dmodel.style.display = 'contents';
@@ -154,16 +178,16 @@
 
                 <div id="questionbox2" class="card" style="visibility: hidden; display: block">
                     <form style="text-align:center;" id="qb2form" name="qb2form">
-                    <p id = "qb2text"> "question2"</p>
-                    <input name="answer_choices" label="Diluent" type="radio" id="answer_choice_1"> <label id = "ac1label" for="answer_choice_1"> Choice 1 </label>       <br/>
-                    <input name="answer_choices" label="Diluent" type="radio" id="answer_choice_2"> <label id = "ac2label" for="answer_choice_2"> Choice 2 </label>        <br/>
-                    <input name="answer_choices" label="Diluent" type="radio" id="answer_choice_3"> <label id = "ac3label" for="answer_choice_3"> Choice 3 </label>        <br/>
-                    <input name="answer_choices" label="Diluent" type="text" id="answer_choice_4" style="visibility:hidden"> <label id = "ac4label" for="answer_choice_4"> Choice 4 </label>        <br/>
+                    <p style = padding:5px; id = "qb2text"> "question2"</p>
+                    <input name="answer_choices"  type="radio" id="answer_choice_1"> <label id = "ac1label" for="answer_choice_1"> Choice 1 </label>       <br/>
+                    <input name="answer_choices"  type="radio" id="answer_choice_2"> <label id = "ac2label" for="answer_choice_2"> Choice 2 </label>        <br/>
+                    <input name="answer_choices"  type="radio" id="answer_choice_3"> <label id = "ac3label" for="answer_choice_3"> Choice 3 </label>        <br/>
+                    <input name="answer_choices"  type="text" id="answer_choice_4" style="visibility:hidden"> <label id = "ac4label" for="answer_choice_4"> Choice 4 </label>        <br/>
                     <input style="text-align:center;" type="submit" value="Submit" />
                     </form>
                 </div>
 
-                                    <div id="desc" class="initdis">
+                    <div id="desc" class="initdis">
                         <ul style="text-align:center;" id="properties"></ul>
                     </div>
             </div>
@@ -394,7 +418,7 @@
             
             let checks = Array.from(document.querySelectorAll('.pkaquestion'));
             checks.forEach(function(ch) {
-                ch.addEventListener("keydown", checkanswer)
+                ch.addEventListener("keyup", checkanswer)
                 console.log(ch)
             })
             let hints = Array.from(document.querySelectorAll('.pkahint'));
