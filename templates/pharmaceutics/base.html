@@ -124,8 +124,8 @@
             <label for="desccheck"> Descriptive Mode</label>
             <input style="display: inline-block;" type="checkbox" id="mapmodecheck" name="mapmodecheck">
             <label for="mapmodecheck"> Map Mode</label>
-            <input style="display: inline-block;" type="checkbox" id="feedbackcheck" name="feedbackcheck">
-            <label for="feedbackcheck">  Feedback</label>
+            <!-- <input style="display: inline-block;" type="checkbox" id="feedbackcheck" name="feedbackcheck">
+            <label for="feedbackcheck">  Feedback</label> -->
             <br>
         <input style="text-align:center;" type="submit" value="Submit" />
     </form>
@@ -158,12 +158,12 @@
         } else {
             dmodel.style.display = 'none';
         }})
-        feedbackcheck.addEventListener('change', () => {
-        if(feedbackcheck.checked) {
-            feedback.style.display = 'contents';
-        } else {
-            feedback.style.display = 'none';
-        }})
+        // feedbackcheck.addEventListener('change', () => {
+        // if(feedbackcheck.checked) {
+        //     feedback.style.display = 'contents';
+        // } else {
+        //     feedback.style.display = 'none';
+        // }})
     </script>
     
     <div class="container-fluid">
@@ -240,7 +240,9 @@
             document.getElementById("druginfo").innerHTML = ""
             document.getElementById("estimates").innerHTML = ""
             document.getElementById("properties").innerHTML = ""
+            feedback.style.display = 'none';
 
+            
             var csrf = $("input[name=csrfmiddlewaretoken]").value;
 
             e.preventDefault();
@@ -723,6 +725,7 @@
             if(allSolved){
                 console.log("all Solved")
                 document.getElementById("questionbox1").classList.add("solved")
+                feedback.style.display = 'contents';
                 document.getElementById("questionbox1").querySelector("#litpka").style.visibility = "visible"
             }
             
