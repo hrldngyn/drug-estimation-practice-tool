@@ -26,7 +26,7 @@ SECRET_KEY = '546&k-=o$965c_238ick4=ck0!q57eny&qt2#u+)@i3vxl-=yh'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['http://drug-explore.eba-vf3a3sdh.us-west-2.elasticbeanstalk.com', '127.0.0.1']
+ALLOWED_HOSTS = ['drugtool-env.eba-qcmrhn7u.us-west-2.elasticbeanstalk.com', '127.0.0.1']
 
 
 # Application definition
@@ -69,7 +69,7 @@ TEMPLATES = [
     },
 ]
 
-WSGI_APPLICATION = 'ebdjango.wsgi.application'
+WSGI_APPLICATION = 'ebdjango/wsgi.py'
 
 
 # Database
@@ -121,4 +121,4 @@ USE_TZ = True
 
 STATIC_URL = '/static/'
 STATICFILES_DIRS = [os.path.join(BASE_DIR, 'static'),]
-STATIC_ROOT = os.path.join(BASE_DIR, 'assets')
+STATIC_ROOT = 'static'

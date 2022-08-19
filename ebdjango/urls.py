@@ -18,6 +18,7 @@ from django.urls import path
 from pharmaceutics.views import Pharm_Toys, pka
 
 urlpatterns = [
+    path('', Pharm_Toys, name="Pharm Toys"),
     path('admin/', admin.site.urls),
     path('pharmaceutics', Pharm_Toys, name="Pharm Toys"),
     path('pharmaceutics_pka', pka)

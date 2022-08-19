@@ -349,11 +349,11 @@ def estimateMolecule(m):
     # for i in alcoholindices:
     #     estimates.append([id, i, BFestimate(m, i, EWGindices, 14), "Alcohol"])
     #     id += 1
-    for i in phenolindices:
-        est = BFestimate(m, i, EWGindices, 10)
-        if(est[0] < mostAcidic[1]):
-            mostAcidic = [i, est[0], "Phenol", est[1]]
-            estimates[0] = mostAcidic
+    # for i in phenolindices:
+    #     est = BFestimate(m, i, EWGindices, 10)
+    #     if(est[0] < mostAcidic[1]):
+    #         mostAcidic = [i, est[0], "Phenol", est[1]]
+    #         estimates[0] = mostAcidic
 
         # estimates.append([id, i, BFestimate(m, i, EWGindices, 10), "Phenol"])
         # id += 1
@@ -458,6 +458,12 @@ def getRotatableBonds(m):
     print("THESE ARE ROTB BONDS PASSED:")
     print(bonds)
     return bonds
+
+def getAlcohols(m):
+    alcoholindices = []
+    for x in m.GetSubstructMatches(Chem.MolFromSmarts('[#6][OX2H]')):
+        if x[1] not in excludeindices:
+            alcoholindices.append(x[1])
 
 def getMap(m, type, d):
     if type == "logp":
