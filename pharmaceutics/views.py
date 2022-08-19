@@ -36,7 +36,7 @@ def Pharm_Toys(req):
             litpka = 0
             reference = ""
         return JsonResponse({'molsvg': molsvg, 'invertmolsvg': invertmolsvg, 'estimates': estimates, 'props': props, 'rotbs': rotbs, 'fglist': fglist, 'litpka': litpka, 'reference': reference }, status=200)
-    return render(req, "Pharmaceutics/base.html", {'molecule_list':molecule_list})
+    return render(req, "pharmaceutics/base.html", {'molecule_list':molecule_list})
 
 
 def pka(req):
