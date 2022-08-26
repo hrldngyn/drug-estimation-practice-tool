@@ -15,11 +15,15 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path
-from pharmaceutics.views import Pharm_Toys, pka
+from pharmaceutics.views import Pharm_Toys, manySVG, quiz1, quiz1post, quiz2
 
 urlpatterns = [
     path('', Pharm_Toys, name="Pharm Toys"),
+    path('manySVG', manySVG, name="Pharm Toys"),
+    path('quiz1', quiz1, name="Quiz 1"),
+    path('quiz1post', quiz1post, name="Quiz 1"),
+    path('quiz2', quiz2, name="Quiz 2"),
     path('admin/', admin.site.urls),
     path('pharmaceutics', Pharm_Toys, name="Pharm Toys"),
-    path('pharmaceutics_pka', pka)
+
 ]

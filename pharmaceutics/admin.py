@@ -3,6 +3,14 @@ from django.contrib import admin
 # Register your models here.
 from .models import *
 
+from django.contrib.sessions.models import Session
+
+class SessionAdmin(admin.ModelAdmin):
+    def _session_data(self, obj):
+        return obj.get_decoded()
+    list_display = ['session_key', '_session_data', 'expire_date']
+admin.site.register(Session, SessionAdmin)
+
 class Molecule_FG_pKaList(admin.TabularInline):
     extra = 0
     model = Molecule_FG_pKa

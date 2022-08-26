@@ -372,27 +372,29 @@ def estimateMolecule(m):
     return strippedEsts
 
 def nameToSMILES(name):
-    properties = 'Title,CanonicalSMILES,MolecularWeight,XLogP,TPSA,HBondDonorCount,HBondAcceptorCount,RotatableBondCount'
-    titleindex = properties.split(",").index("Title") - 1 #subtract 1 because CID always shows
-    smilesindex = properties.split(",").index("CanonicalSMILES") + 1
-    url = "https://pubchem.ncbi.nlm.nih.gov/rest/pug/compound/name/" + name + "/property/" + properties + "/csv"
+    # properties = 'Title,CanonicalSMILES,MolecularWeight,XLogP,TPSA,HBondDonorCount,HBondAcceptorCount,RotatableBondCount'
+    # titleindex = properties.split(",").index("Title") - 1 #subtract 1 because CID always shows
+    # smilesindex = properties.split(",").index("CanonicalSMILES") + 1
+    # url = "https://pubchem.ncbi.nlm.nih.gov/rest/pug/compound/name/" + name + "/property/" + properties + "/csv"
+    url = 'https://pubchem.ncbi.nlm.nih.gov/rest/pug/compound/name/' +name+ '/property/CanonicalSMILES/txt';
     
-    if name == "":
-        return Chem.MolFromSmiles("")
+    # if name == "":
+    #     return Chem.MolFromSmiles("")
     try:
         u_a = "Mozilla/5.0 (Macintosh; Intel Mac OS X 10.10; rv:39.0) Gecko/20100101 Firefox/39.0"
         response = requests.get(url, headers={"USER-AGENT":u_a, "Accept": "application/xml"})
         response = requests.get(url)
         response.raise_for_status()
         
-        data = response.text.splitlines()
-        title = response.text.splitlines()[0].split(",")[titleindex]
+        # data = response.text.splitlines()
+        # title = response.text.splitlines()[0].split(",")[titleindex]
         
-        smiles = response.text.splitlines()[1].split(",")[smilesindex].strip('"')
-        for l in data:
-            if name.capitalize() in l:
-                smiles = l.split(",")[smilesindex].strip('"')
-        print(smiles)
+        # smiles = response.text.splitlines()[1].split(",")[smilesindex].strip('"')
+        # for l in data:
+        #     if name.capitalize() in l:
+        #         smiles = l.split(",")[smilesindex].strip('"')
+        # print(smiles)
+        smiles = response.text
         return smiles
 
     except requests.exceptions.HTTPError as errh:
