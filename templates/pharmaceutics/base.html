@@ -17,8 +17,8 @@
     min-height: 50%;
     max-width: 100%;
     max-height: 100%;
-    margin: 0 auto;
-    /* top: 0; */
+    margin: 0;
+    top: 0;
     
     background-color: rgba(0,0,0,0.3);
     z-index: 2;
@@ -53,8 +53,8 @@
         outline: 5px dotted green;
     }
     .column {
-        float: left;
-        width: 66.6%;
+        float: right;
+        width: 50%;
         padding: 5px;
     }
     .initdis {
@@ -116,11 +116,11 @@
 
 <div id="page-container" class="">
     <div id="content-wrap">
-        <div class="container-fluid teal darken-4" style="height: 5rem;">
-            <div class="h-100 text-center display-4 text-white">Pharmaceutics pKa</div>
+        <div class="container-fluid teal darken-4" style="height: 4rem;">
+            <div class="text-center display-4 text-white" style="scale:75%">Pharmaceutics pKa</div>
     </div>
         
-    <input style="text-align:center; margin: 5px;" type="button" value="Help" id="help" onclick="helpdisplay()"/>
+    <input style="text-align:center; margin-left: 5px; margin-top: 3px;" type="button" value="Help" id="help" onclick="helpdisplay()"/>
     {% load static %}
     <div id = "tutorial-container">
         <img id="tutorial1" class="tutorial" src="{% static 'ebdjango/tutorial1.png' %}" onclick="helpdisplay2()">
@@ -129,16 +129,16 @@
     </div>
       
     <form style="text-align:center;" id="drugLookupForm" name="myForm">
-        <label for="molecule-dropdown"> Database Drugs </label>
-        <select id="molecule-dropdown">
+        <select id="molecule-dropdown" style="text-align:center;">
+            <option style="display:none;" selected>Select Database Drug</option>
             {% for mol in molecule_list %}
                 <option value = {{ mol }}>{{ mol }}</option>
             {% endfor %}
-        
-        <label>Drug Search: <input type="text" name="fname" id="fname" style="width:750px; background: rgb(201, 237, 196);" placeholder="Search Drug Name via PubChem, or leave blank to use dropdown. Separate up to 4 drugs with commas."></label>
+
+        <label>Drug Search: <input type="text" name="fname" id="fname" style="width:500px; margin-top: 5px;" placeholder="Custom Drug Search"></label>
         <br/>
-            <label for="maptag"> Map Overlay </label>
-            <select id="maptag" name="maptag">
+            <select id="maptag" name="maptag" style="text-align:center;">
+                <option style="display:none;" selected>Map Overlay</option>
                 <option value="electron">Electronegativity</option>
                 <option value="logp">Hydrophobicity</option>
             
@@ -198,12 +198,12 @@
             <div class="column">
                         {{ svg|safe }}
                         {% csrf_token %}
-                        <ul style="text-align:center;" id="druginfo"></ul>
+                        <ul style="text-align:left; margin-left: 5px;" id="druginfo"></ul>
             </div>
             
             <div>
                 <div id="questionbox1" class="card" style="visibility: hidden">
-                    <text style="visibility:inherit; text-align:center">Pka and FG questions</text>
+                    <text style="visibility:inherit; text-align:center">FG and rotatable bond questions</text>
                     <ul style="text-align:center;" id="estimates"></ul>
                     <ul id="feedbackq1"></ul>
                     <div id="feedback" class="initdis" style="visibility: none;">
@@ -220,7 +220,7 @@
                     <input name="answer_choices"  type="radio" id="answer_choice_2"> <label id = "ac2label" for="answer_choice_2"> Choice 2 </label>        <br/>
                     <input name="answer_choices"  type="radio" id="answer_choice_3"> <label id = "ac3label" for="answer_choice_3"> Choice 3 </label>        <br/>
                     <input name="answer_choices"  type="text" id="answer_choice_4" style="visibility:hidden;width:200px"> <label id = "ac4label" for="answer_choice_4"> Choice 4 </label>        <br/>
-                    <input style="text-align:center;" type="submit" value="Submit" />
+                    <input style="text-align:center;" type="submit" value="Submit" id="qb2submitbutton" />
                     </form>
                 </div>
 
@@ -489,6 +489,7 @@
         }
         function showquestion2(pka, ref){
             document.getElementById("questionbox2").style.visibility = 'visible'
+            document.getElementById("qb2submitbutton").disabled = false;
             document.getElementById("qb2text").innerText = "There's no apparent carboxylic acid or amine in this molecule. Do you think it's still an acid or a base?"
 
             if(pka < 7){
@@ -537,6 +538,7 @@
             } else if (val.match("correct") ) {
                 $("#questionbox2").append(`Nice! You were ${(parseFloat($("#litpka2").data("litpka"))-parseFloat(answer_choice_4.value)).toPrecision(2)} off of the literature value.`);
                 document.getElementById("litpka2").style.visibility = "visible"
+                document.getElementById("qb2submitbutton").disabled = true;
             } else {
                 alert('Answer is wrong');
             }
