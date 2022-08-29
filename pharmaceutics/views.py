@@ -1,7 +1,5 @@
-from logging import exception
 from django.shortcuts import render
 from django.http import HttpResponse, JsonResponse
-from matplotlib.font_manager import json_dump
 # Create your views here.
 # from .pharm import svg
 from rdkit import Chem
