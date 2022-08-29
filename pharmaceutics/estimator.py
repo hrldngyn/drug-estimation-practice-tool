@@ -483,7 +483,7 @@ def getMap(m, type, d):
 def getSVG(urlsmiles, maptag = "logp", showanswers = True, estimates = []): #takes smiles and gets tagged svg
 
     smiles = urllib.parse.unquote(urlsmiles)
-    print ("attempting to generate svg for: " + smiles)
+    print("attempting to generate svg for: " + smiles + "\n maptag: " + str(maptag) + "\n showanswers" + str(showanswers))
     
     m = Chem.MolFromSmiles(smiles)
     if showanswers:

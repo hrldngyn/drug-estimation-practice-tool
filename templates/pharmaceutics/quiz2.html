@@ -33,6 +33,7 @@
             <input type="button" value="Begin Quiz 2" id="begin" onclick="begin()">
         </div>
         <form>
+            {% csrf_token %}
             <div id="questionbox1" class="card" style="visibility: hidden; display: block;">                
                 <p style = padding:5px; id = "qb1text"> "Which of these molecules would have the highest logP?"</p>
                 <img src="">
@@ -78,7 +79,7 @@
     </div>
     
 </body>
-
+<script src="https://code.jquery.com/jquery-3.6.0.js" integrity="sha256-H+K7U5CnXl1h5ywQfKtSj8PCmoN9aaq30gDh27Xc0jk=" crossorigin="anonymous"></script>
 <script>
     var sec = 0
     var t
@@ -100,17 +101,30 @@
             url: 'quiz2post',
             type: 'post',
             data: {
-                q1: "",
-                q2: "",
-                q3: "",
-                q4: "",
-                q5: "",
+                timestamp:Date.now(),
+                seconds:sec,
+                q1: getValue("questionbox1"),
+                q2: getValue("questionbox2"),
+                q3: getValue("questionbox3"),
+                q4: getValue("questionbox4"),
+                q5: getValue("questionbox5"),
             },
             success: function(response) {
                 console.log('responses have been saved')
             }
         })
     }
+    function getValue(questionid){
+            buts=Array.from(document.querySelectorAll(`#${questionid} input`))
+            checkedid = ""
+            buts.forEach(function(but){
+                if(but.checked){
+                    checkedid = but.id
+                }
+            })
+
+            return checkedid;
+        }
     function timer(){
         t = setTimeout(tick, 1000)
     }

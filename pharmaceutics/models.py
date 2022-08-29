@@ -1,6 +1,8 @@
+from sqlite3 import Timestamp
 from django.db import models
 from django.db.models.base import Model
 from django.db.models.fields import BooleanField
+from sqlalchemy import ForeignKey
 
 # Create your models here.
 
@@ -17,7 +19,12 @@ class Molecule(models.Model):
     ) 
     Difficulty = models.CharField(max_length = 9, choices=difficulty_choices, default="easy")
     Reference = models.CharField(max_length=1000, blank=True)
-    
+    ion_choices = (
+        ("acid","acid"),
+        ("base","base"),
+        ("none","none")
+    ) 
+    Ion_Type = models.CharField(max_length = 9, choices=ion_choices, default="none")
     
 
 
@@ -87,3 +94,41 @@ class Protein(models.Model):
     
     def __str__(self):
         return self.Name
+
+
+class User(models.Model):
+    Key = models.CharField(max_length=40, blank=False)
+    FGs_Solved = models.ManyToManyField(Molecule, related_name= "solvedfg_users", null = True)
+    Pkas_Solved = models.ManyToManyField(Molecule, related_name= "solvedpka_users", null = True)
+    Maps_Solved = models.ManyToManyField(Molecule, related_name= "solvedmap_users", null = True)
+    Rotbs_Solved = models.ManyToManyField(Molecule, related_name= "solvedrotb_users", null = True)
+    def __str__(self):
+        return self.Key
+
+class Query(models.Model):
+    User = models.ForeignKey("User", on_delete=models.CASCADE)
+    Molecules = models.ForeignKey(Molecule, on_delete=models.CASCADE)
+    MapMode = models.BooleanField(default=False)
+    Time = models.CharField(max_length=20, blank=False)
+
+class SolvedQuery(models.Model):
+    Query = models.ForeignKey("Query", on_delete=models.CASCADE)
+class Quiz1Attempt(models.Model):
+    User = models.ForeignKey("User", on_delete=models.CASCADE)
+    Timestamp = models.CharField(max_length=20, blank=False)
+    Secs_Taken = models.IntegerField(max_length=5, blank=False)
+    Answer1 = models.CharField(max_length=6, blank=False, null=True)
+    Answer2 = models.CharField(max_length=6, blank=False, null=True)
+    Answer3 = models.CharField(max_length=6, blank=False, null=True)
+    Answer4 = models.CharField(max_length=6, blank=False, null=True)
+    Answer5 = models.CharField(max_length=6, blank=False, null=True)
+
+class Quiz2Attempt(models.Model):
+    User = models.ForeignKey("User", on_delete=models.CASCADE)
+    Timestamp = models.CharField(max_length=20, blank=False)
+    Secs_Taken = models.IntegerField(max_length=5, blank=False)
+    Answer1 = models.CharField(max_length=6, blank=False)
+    Answer2 = models.CharField(max_length=6, blank=False)
+    Answer3 = models.CharField(max_length=6, blank=False)
+    Answer4 = models.CharField(max_length=6, blank=False)
+    Answer5 = models.CharField(max_length=6, blank=False)

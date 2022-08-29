@@ -1,5 +1,7 @@
+from logging import exception
 from django.shortcuts import render
 from django.http import HttpResponse, JsonResponse
+from matplotlib.font_manager import json_dump
 # Create your views here.
 # from .pharm import svg
 from rdkit import Chem
@@ -7,10 +9,18 @@ from .estimator import *
 from .models import *
 import json
 
+empty = []
+
 def Pharm_Toys(req):
     # print("THIS IS THE REQ", req)
     # context = {"svg": svg}
     # print(req)
+
+    #if user doesnt exist make a new user
+    if(not User.objects.filter(Key = req.session.session_key).exists()):
+        print("making a user")
+        newuser = User(Key = req.session.session_key)
+        newuser.save()
 
     molecule_list = Molecule.objects.all()
     num_drugs_viewed = req.session.get('num_drugs_viewed', 0)
@@ -33,21 +43,38 @@ def Pharm_Toys(req):
         rotbs = getRotatableBonds(m)
         try:
             datamol = Molecule.objects.filter(Molecule_Name = req.GET['mol'])[0]
+            # visited_drugs.append(datamol.Molecule_Name)
             litpka = datamol.LiteraturePka
             reference = datamol.Reference
         except:
+            datamol = Molecule.objects.create(
+                Molecule_Name = req.GET['mol'].strip().capitalize(),
+                SMILES = req.GET['smiles']
+                )
             print(req.GET['mol'] + " not found in database.")
             litpka = 0
             reference = ""
+
+        #save the query
+        user=User.objects.get(Key = req.session.session_key)
+        mode = req.GET['mapmodecheck'] == "true"
+        q = Query(
+            User=user,
+            Molecules=datamol,
+            Time= req.GET['timestamp'], 
+            MapMode=mode
+        )
+        q.save()
+
+
         return JsonResponse({'molsvg': molsvg, 'invertmolsvg': invertmolsvg, 'estimates': estimates, 'props': props, 'rotbs': rotbs, 'fglist': fglist, 'litpka': litpka, 'reference': reference }, status=200)
     return render(req, "pharmaceutics/base.html", {'molecule_list':molecule_list})
 
 def manySVG(req):
     if req.headers.get('x-requested-with') == 'XMLHttpRequest':
         if(len(req.GET['mols'].split(',')) > 4):
-            print("too many drugs")
+            print("too many drugs, limit to 4")
             return
-        
         # Scraper()
         retsvgs = []
         retprops = []
@@ -58,10 +85,13 @@ def manySVG(req):
             try:
                 smiles = nameToSMILES(name.strip())
                 m = Chem.MolFromSmiles(nameToSMILES(name))
-                svg = getSVG(smiles, showanswers=(req.GET['desccheck']=="true"), maptag=req.GET['maptag'])
+                estimates = estimateMolecule(m)
+                svg = getSVG(smiles, estimates = estimates, showanswers=(req.GET['desccheck']=="true"), maptag=req.GET['maptag'])
                 prop = json.dumps(getProperties(m))
-            except:
+            except Exception as e:
+                print(e)
                 print("invalid mol name")
+                continue
         # print("attempting svg get" + i)
         # m = Chem.MolFromSmiles(req.GET['smiles'])
         # estimates = estimateMolecule(m) #estimates is a list [id, index, estpka, type]
@@ -82,38 +112,101 @@ def manySVG(req):
                 retprops.append(prop)
                 retlitpkas.append(litpka)
                 retreferences.append(reference)
+
             except:
+                datamol = Molecule.objects.create(
+                    Molecule_Name = name.strip().capitalize(),
+                    SMILES = smiles
+                    )
                 print(name + " not found in database.")
                 litpka = 0
                 reference = ""
+
+            #save the query
+            user=User.objects.get(Key = req.session.session_key)
+            q = Query(
+                User=user,
+                Molecules=datamol,
+                Time= req.GET['timestamp'], 
+                MapMode=False
+            )
+            q.save()
+
+
 
 
 
         return JsonResponse({'svgs': retsvgs, 'props': retprops, 'litpka': retlitpkas, 'reference': retreferences }, status=200)
 
 def quiz1(req):
+    if(not User.objects.filter(Key = req.session.session_key).exists()):
+        print("making a user")
+        newuser = User(Key = req.session.session_key)
+        newuser.save()
     quiz1_solve_time = req.session.get('quiz1_solve_time', 0)
     return render(req, "pharmaceutics/quiz1.html")
 def quiz2(req):
+    if(not User.objects.filter(Key = req.session.session_key).exists()):
+        print("making a user")
+        newuser = User(Key = req.session.session_key)
+        newuser.save()
     quiz2_solve_time = req.session.get('quiz2_solve_time', 0)
     return render(req, "pharmaceutics/quiz2.html")
 
 def quiz1post(req):
     if req.method == "POST":
-        req.session['quiz1_1']= req.POST['q1']
-        req.session['quiz1_2']= req.POST['q2']
-        req.session['quiz1_3']= req.POST['q3']
-        req.session['quiz1_4']= req.POST['q4']
-        req.session['quiz1_5']= req.POST['q5']
-
+        print(req.POST)
+        user=User.objects.get(Key = req.session.session_key)
+        q = Quiz1Attempt(
+            User=user, 
+            Timestamp = req.POST.get('timestamp'), 
+            Secs_Taken = req.POST.get('seconds'),
+            Answer1= req.POST.get('q1'), 
+            Answer2= req.POST.get('q2'),
+            Answer3= req.POST.get('q3'),
+            Answer4= req.POST.get('q4'),
+            Answer5= req.POST.get('q5'),
+        )
+        q.save()
         return HttpResponse(status=200)
 
 def quiz2post(req):
     if req.method == "POST":
-        req.session['quiz2_1']= req.POST['q1']
-        req.session['quiz2_2']= req.POST['q2']
-        req.session['quiz2_3']= req.POST['q3']
-        req.session['quiz2_4']= req.POST['q4']
-        req.session['quiz2_5']= req.POST['q5']
+        q = Quiz2Attempt(
+            User=User.objects.get(Key = req.session.session_key), 
+            Timestamp = req.POST.get('timestamp'), 
+            Secs_Taken = req.POST.get('seconds'),
+            Answer1=req.POST.get('q1'), 
+            Answer2=req.POST.get('q2'),
+            Answer3=req.POST.get('q3'),
+            Answer4=req.POST.get('q4'),
+            Answer5=req.POST.get('q5'),
+        )
+        q.save()
+        return HttpResponse(status=200)
 
+#pkasolvepost, fgsolvepost, rotbsolvepost, mapmodesolvepost
+def pkasolvepost(req):
+    if req.method == "POST":
+        datamol = Molecule.objects.get(Molecule_Name = req.POST.get('mol'))
+        user = User.objects.get(Key = req.session.session_key)
+        user.Pkas_Solved.add(datamol)
+        return HttpResponse(status=200)
+def fgsolvepost(req):
+    if req.method == "POST":
+        datamol = Molecule.objects.get(Molecule_Name = req.POST.get('mol'))
+        user = User.objects.get(Key = req.session.session_key)
+        user.FGs_Solved.add(datamol)
+        return HttpResponse(status=200)
+def rotbsolvepost(req):
+    if req.method == "POST":
+        datamol = Molecule.objects.get(Molecule_Name = req.POST.get('mol'))
+        user = User.objects.get(Key = req.session.session_key)
+        user.Rotbs_Solved.add(datamol)
+        return HttpResponse(status=200)
+def mapmodesolvepost(req):
+    if req.method == "POST":
+        datamol = Molecule.objects.get(Molecule_Name = req.POST.get('mol'))
+        user = User.objects.get(Key = req.session.session_key)
+        user.Maps_Solved.add(datamol)
         return HttpResponse(status=200)

@@ -101,17 +101,30 @@
             url: 'quiz1post',
             type: 'post',
             data: {
-                q1: "",
-                q2: "",
-                q3: "",
-                q4: "",
-                q5: "",
+                timestamp:Date.now(),
+                seconds:sec,
+                q1: getValue("questionbox1"),
+                q2: getValue("questionbox2"),
+                q3: getValue("questionbox3"),
+                q4: getValue("questionbox4"),
+                q5: getValue("questionbox5"),
             },
             success: function(response) {
                 console.log('responses have been saved')
             }
         })
     }
+    function getValue(questionid){
+            buts=Array.from(document.querySelectorAll(`#${questionid} input`))
+            checkedid = ""
+            buts.forEach(function(but){
+                if(but.checked){
+                    checkedid = but.id
+                }
+            })
+
+            return checkedid;
+        }
     function timer(){
         t = setTimeout(tick, 1000)
     }
