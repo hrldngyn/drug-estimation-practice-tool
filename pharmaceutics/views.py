@@ -216,12 +216,10 @@ def subjectivepost(req):
         datamol = Molecule.objects.get(Molecule_Name = req.POST.get('mol').strip().capitalize())
         user = User.objects.get(Key = req.session.session_key)
         difficulty = req.POST.get('difficulty')
-        questionbox = req.POST.get('questionbox')
         sf = SubjectiveFeedback(
             User = user,
             Molecule = datamol,
             Difficulty = difficulty,
-            QuestionBox = questionbox
         )
         sf.save()
         return HttpResponse(status=200)

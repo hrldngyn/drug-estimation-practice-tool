@@ -137,4 +137,3 @@ class SubjectiveFeedback(models.Model):
     User = models.ForeignKey("User", on_delete=models.CASCADE)
     Molecule = models.ForeignKey("Molecule", on_delete=models.CASCADE)
     Difficulty = models.CharField(max_length=18, blank=False, null=False)
-    QuestionBox = models.CharField(max_length=15, blank=False, null=False)

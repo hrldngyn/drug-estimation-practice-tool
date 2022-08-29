@@ -902,7 +902,7 @@
                 allSolved = allSolved && rotb.classList.contains("solved")
 
             })
-            
+
             if(allSolved){
                 console.log("all Solved")
                 document.getElementById("questionbox1").classList.add("solved")
@@ -922,7 +922,7 @@
             difficulty.value = difficultysettings[slidernumber.value];
         }
 
-        function subjectiveSubmit(qbname){
+        function subjectiveSubmit(){
             $.ajax({
                     headers: { "X-CSRFToken": token },
                     url: 'subjectivepost',
@@ -930,7 +930,6 @@
                     data: {
                         mol: name,
                         difficulty: difficulty.value
-                        questionbox: qbname
                     },
                     success: function(response) {
                         console.log('recorded subjective')
