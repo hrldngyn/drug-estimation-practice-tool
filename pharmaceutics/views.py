@@ -15,6 +15,11 @@ def Pharm_Toys(req):
     # print(req)
 
     #if user doesnt exist make a new user
+    # if req.session.test_cookie_worked():
+    #     req.session.delete_test_cookie()
+    #     return HttpResponse("You're logged in.")
+    if not req.session.session_key:
+        req.session.create()
     if(not User.objects.filter(Key = req.session.session_key).exists()):
         print("making a user")
         newuser = User(Key = req.session.session_key)
@@ -67,9 +72,13 @@ def Pharm_Toys(req):
         iontype = datamol.Ion_Type
 
         return JsonResponse({'molsvg': molsvg, 'invertmolsvg': invertmolsvg, 'estimates': estimates, 'props': props, 'rotbs': rotbs, 'fglist': fglist, 'litpka': litpka, 'reference': reference, 'iontype': iontype }, status=200)
+    
+    req.session.set_test_cookie()
     return render(req, "pharmaceutics/base.html", {'molecule_list':molecule_list})
 
 def manySVG(req):
+    if not req.session.session_key:
+        req.session.create()
     if req.headers.get('x-requested-with') == 'XMLHttpRequest':
         if(len(req.GET['mols'].split(',')) > 4):
             print("too many drugs, limit to 4")
@@ -138,6 +147,8 @@ def manySVG(req):
         return JsonResponse({'svgs': retsvgs, 'props': retprops, 'litpka': retlitpkas, 'reference': retreferences }, status=200)
 
 def quiz1(req):
+    if not req.session.session_key:
+        req.session.create()
     if(not User.objects.filter(Key = req.session.session_key).exists()):
         print("making a user")
         newuser = User(Key = req.session.session_key)
@@ -145,6 +156,8 @@ def quiz1(req):
     quiz1_solve_time = req.session.get('quiz1_solve_time', 0)
     return render(req, "pharmaceutics/quiz1.html")
 def quiz2(req):
+    if not req.session.session_key:
+        req.session.create()
     if(not User.objects.filter(Key = req.session.session_key).exists()):
         print("making a user")
         newuser = User(Key = req.session.session_key)
