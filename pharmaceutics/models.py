@@ -2,7 +2,6 @@ from sqlite3 import Timestamp
 from django.db import models
 from django.db.models.base import Model
 from django.db.models.fields import BooleanField
-from sqlalchemy import ForeignKey
 
 # Create your models here.
 
