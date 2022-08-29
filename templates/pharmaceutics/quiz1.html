@@ -17,16 +17,16 @@
         pointer-events: auto;
         margin-left: 10px;
     }
-    .right{
-        background: rgb(0, 88, 0);
+    .card.correct {
+        outline: solid rgb(0, 255, 0);
     }
-    .card.right {
-        background: rgb(0, 88, 0);
+    .card.incorrect{
+        outline: solid red;
     }
-    .wrong{
-        background: red;
+    .results {
+    background-color: #ddd;
+    margin-left: 20%;
     }
-
 
     </style>
 </head>
@@ -39,14 +39,11 @@
     <input type="button" value="Begin Quiz 1" id="begin" onclick="begin()" style="display: block; margin: 0 auto;">
 
 
-    <div id="visualcolumn" style="float:left; width:50%; padding:5px; visibility: hidden;">
+    <div id="visualcolumn" style="float:left; width:66%; padding:5px; visibility: hidden;">
     add visuals and SVGs here
     </div>
     
-    
-    
-    <div id="questioncolumn" style="float:right; width:50%; padding:5px;">
-
+    <div id="questioncolumn" style="float:right; width:33%; padding:5px;">
             {% csrf_token %}
             <div id="questionbox1" class="card" style="visibility: hidden; display: block;">                
                 <p style = padding:5px; id = "qb1text"> "Which of these molecules would have the highest logP?"</p>
@@ -88,17 +85,15 @@
                 <input name="qb5choices"  type="radio" id="qb5_3"> <label id = "ac3label" for="qb5_3"> Choice 3 </label>        <br/>
                 <input name="qb5choices"  type="radio" id="qb5_4"> <label id = "ac4label" for="qb5_4"> Choice 4 </label>        <br/>
             </div>
-            <input name="submit" type="button" id="submit" value="Submit" style="visibility: hidden;" onclick="handleSubmit(), results">
+            <input name="submit" type="button" id="submitquiz" value="Submit" style="visibility: hidden;" onclick="validateresults()">
     </div>
 
-    <div id="results" class="" style="visibility: hidden; display: block;">                
-        <p style = "padding:5px; text-align: center;" id = "qb1text"> "Results"</p>
-
-               
+    <div id="results" class="results" style="visibility: hidden; display: inline-block; width: 60%;">                
+        <p style = "padding:5px; text-align: center;" id = "qb1text"> <strong>Results</strong></p>
+        <p id="score"></p>
     </div>
-
-    
 </body>
+
 <script src="https://code.jquery.com/jquery-3.6.0.js" integrity="sha256-H+K7U5CnXl1h5ywQfKtSj8PCmoN9aaq30gDh27Xc0jk=" crossorigin="anonymous"></script>
 <script>
     var sec = 0
@@ -108,16 +103,21 @@
         document.getElementById("begin").style.visibility = "hidden";
         timer()
         document.getElementById("visualcolumn").style.visibility = "visible"
-        document.getElementById("submit").style.visibility = "visible"
+        document.getElementById("submitquiz").style.visibility = "visible"
         cards = Array.from(document.querySelectorAll(".card"))
         cards.forEach(function(el){
             el.style.visibility = "visible"
-                        
         });
+        //TEST PURPOSES ONLY.
+        document.getElementById("qb1_1").value = "correct"
+        document.getElementById("qb2_2").value = "correct"
+        document.getElementById("qb3_3").value = "correct"
+        document.getElementById("qb4_4").value = "correct"
+        document.getElementById("qb5_1").value = "correct"
+        //TEST PURPOSES ONLY.
     }
+    
     function handleSubmit(){
-        document.getElementById("questionbox1").classList.add("right");
-
         var token = '{{csrf_token}}';
         clearTimeout(t)
         console.log(sec)
@@ -138,35 +138,43 @@
         })
     }
 
-    function results(e){
-    e.preventDefault();
+    function validateresults(){
+    var correctanswers = 0
+    var solved = new Boolean(false);
+    let radioanswers = [document.getElementsByName('qb1choices'),document.getElementsByName('qb2choices'),document.getElementsByName('qb3choices'),document.getElementsByName('qb4choices'),document.getElementsByName('qb5choices')]
+    var questionboxes = [document.getElementById("questionbox1"), document.getElementById("questionbox2"),document.getElementById("questionbox3"),document.getElementById("questionbox4"),document.getElementById("questionbox5")]
+    val = new Array
 
-    var correctanswers
-
-    var radios1 = document.getElementsByName('qb1choices');
-    var val= "";
-        for (var i = 0, length = radios.length; i < length; i++) {
-        if (radios[i].checked) {
-            val = radios[i].value; 
-            break;
+        for (var k=0, length = radioanswers.length; k<length; k++){
+            for (var i = 0; i < 4; i++) {
+                if (radioanswers[k][i].checked) {
+                val[val.length] = radioanswers[k][i].value;
+                break;}
+            }
         }
+
+        for (var i=0, numberofq = questionboxes.length; i < numberofq; i++){
+        if (val.length != numberofq ) {
+            alert('Not all questions have been answered');
+            correctanswers = 0
+            break;
+        } else if (val[i].match("correct") ) {
+            questionboxes[i].classList.add("correct");
+            correctanswers++
+            solved = true
+        } else {
+            questionboxes[i].classList.add("incorrect");
+            solved = true
+        }
+        }
+    if (solved == true) {
+        handleSubmit();
+        document.getElementById("submitquiz").style.display = "none";
+        document.getElementById("results").style.visibility = "visible";
+        document.getElementById("score").innerHTML = "You correctly answered " + `${correctanswers}` +" out of 5 questions."
+    }
     }
 
-    if (val == "" ) {
-        alert('Select a choice');
-    } else if (val.match("correct") ) {
-        document.getElementById("questionbox1").classList.add("right")
-    } else {
-        document.getElementById("questionbox1").classList.add("wrong")
-        alert('Answer is wrong');
-    }
-    }
-
-    //function validateresults(){
-
-
-
-    
     function timer(){
         t = setTimeout(tick, 1000)
     }
