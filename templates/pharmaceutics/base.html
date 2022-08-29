@@ -176,12 +176,12 @@
         } else {
             desc.style.display = 'none';
         }})
-        mapmodecheck.addEventListener('change', () => {
-        if(mapmodecheck.checked) {
-            dmodel.style.display = 'contents';
-        } else {
-            dmodel.style.display = 'none';
-        }})
+        // mapmodecheck.addEventListener('change', () => {
+        // if(mapmodecheck.checked) {
+        //     dmodel.style.display = 'contents';
+        // } else {
+        //     dmodel.style.display = 'none';
+        // }})
         // feedbackcheck.addEventListener('change', () => {
         // if(feedbackcheck.checked) {
         //     feedback.style.display = 'contents';
@@ -375,7 +375,7 @@
                             }
 
                             if(estimates.length ==0 && response.litpka != 0){
-                                showquestion2(response.litpka, response.reference)
+                                showquestion2(response.iontype, response.litpka, response.reference)
                             }
                             else{
                                 writeLitPka(response.litpka, response.reference)
@@ -505,16 +505,16 @@
             }
             
         }
-        function showquestion2(pka, ref){
+        function showquestion2(database_iontype, pka, ref){
             document.getElementById("questionbox2").style.visibility = 'visible'
             document.getElementById("qb2submitbutton").disabled = false;
             document.getElementById("qb2text").innerText = "There's no apparent carboxylic acid or amine in this molecule. Do you think it's still an acid or a base?"
 
-            if(pka < 7){
+            if(database_iontype == "acid"){
                 document.getElementById("answer_choice_1").value = "correct"
-            }else if(pka > 7){
+            }else if(database_iontype == "base"){
                 document.getElementById("answer_choice_2").value = "correct"
-            }else if(pka == 7){
+            }else if(database_iontype == "none"){
                 document.getElementById("answer_choice_3").value = "correct"
             }
             
@@ -554,7 +554,7 @@
             if (val == "" ) {
                 alert('Select a choice');
             } else if (val.match("correct") ) {
-                $("#questionbox2").append(`Nice! You were ${(parseFloat($("#litpka2").data("litpka"))-parseFloat(answer_choice_4.value)).toPrecision(2)} off of the literature value.`);
+                $("#questionbox2").append(`Nice! You were ${(parseFloat($("#litpka2").data("litpka"))-parseFloat(document.getElementById("answer_choice_4").value)).toPrecision(2)} off of the literature value.`);
                 document.getElementById("litpka2").style.visibility = "visible"
                 document.getElementById("qb2submitbutton").disabled = true;
             } else {
@@ -783,7 +783,7 @@
             console.log(answer)
             field = e.currentTarget.querySelector('input')
             console.log(field)
-            if (field.value.match(answer)){
+            if (field.value == answer){
                 e.currentTarget.lastChild.innerHTML = "✔"
                 field.readOnly = true
                 e.currentTarget.classList.add("solved")

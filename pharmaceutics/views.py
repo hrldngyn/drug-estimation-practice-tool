@@ -66,8 +66,9 @@ def Pharm_Toys(req):
         )
         q.save()
 
+        iontype = datamol.Ion_Type
 
-        return JsonResponse({'molsvg': molsvg, 'invertmolsvg': invertmolsvg, 'estimates': estimates, 'props': props, 'rotbs': rotbs, 'fglist': fglist, 'litpka': litpka, 'reference': reference }, status=200)
+        return JsonResponse({'molsvg': molsvg, 'invertmolsvg': invertmolsvg, 'estimates': estimates, 'props': props, 'rotbs': rotbs, 'fglist': fglist, 'litpka': litpka, 'reference': reference, 'iontype': iontype }, status=200)
     return render(req, "pharmaceutics/base.html", {'molecule_list':molecule_list})
 
 def manySVG(req):
