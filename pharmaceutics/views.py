@@ -211,7 +211,12 @@ def mapmodesolvepost(req):
         user = User.objects.get(Key = req.session.session_key)
         user.Maps_Solved.add(datamol)
         return HttpResponse(status=200)
-
+def qb2solvepost(req):
+    if req.method == "POST":
+        datamol = Molecule.objects.get(Molecule_Name = req.POST.get('mol').strip().capitalize())
+        user = User.objects.get(Key = req.session.session_key)
+        user.Qb2s_solved.add(datamol)
+        return HttpResponse(status=200)
 def subjectivepost(req):
     if req.method == "POST":
         datamol = Molecule.objects.get(Molecule_Name = req.POST.get('mol').strip().capitalize())

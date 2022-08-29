@@ -419,7 +419,7 @@
             mapbox = document.querySelector('.mapbox')
             form = '<form><div id="mapboxquestion" class="card" style="display: block;"><p style = padding:5px; id = "mapqb1text"> "Which of these depictions is more accurate?"</p><input name="mapqb1choices"  type="radio" id="mapqb1_1"> <label id = "ac1label" for="mapqb1_1"> Choice 1 </label>       <br/>               <input name="mapqb1choices"  type="radio" id="mapqb1_2"> <label id = "ac2label" for="mapqb1_2"> Choice 2 </label>       <br/><input name="submit" value="Submit" type="button" id="mapsubmit" onclick="mapSubmit()"><h3 id="mapfeedback"></h3></div></form>'
             if(Math.floor(Math.random()*2)==0){
-                console.log("svg then invert")
+                // console.log("svg then invert")
                 mapbox.innerHTML += svg
                 mapbox.innerHTML += invertsvg
                 mapbox.innerHTML += form
@@ -430,7 +430,7 @@
             }
                 
             else{
-                console.log("invert then normal")
+                // console.log("invert then normal")
                 mapbox.innerHTML += invertsvg
                 mapbox.innerHTML += svg
                 mapbox.innerHTML += form
@@ -557,6 +557,19 @@
                 $("#questionbox2").append(`Nice! You were ${(parseFloat($("#litpka2").data("litpka"))-parseFloat(document.getElementById("answer_choice_4").value)).toPrecision(2)} off of the literature value.`);
                 document.getElementById("litpka2").style.visibility = "visible"
                 document.getElementById("qb2submitbutton").disabled = true;
+
+                $.ajax({
+                    headers: { "X-CSRFToken": token },
+                    url: 'qb2solvepost',
+                    type: 'post',
+                    data: {
+                        mol: name,
+                    },
+                    success: function(response) {
+                        console.log('added 1 to qb2s solved')
+                    }
+                })
+
             } else {
                 alert('Answer is wrong');
             }
@@ -579,7 +592,7 @@
             let checks = Array.from(document.querySelectorAll('.pkaquestion'));
             checks.forEach(function(ch) {
                 ch.addEventListener("keyup", checkanswer)
-                console.log(ch)
+                // console.log(ch)
             })
             let hints = Array.from(document.querySelectorAll('.pkahint'));
             hints.forEach(function(ch) {
@@ -635,12 +648,12 @@
             let i = parseInt(t.classList[1].replace("atom-", ""))
             
             fgbut = $(document).find(".fg.active")
-            console.log(fgbut)       
+            // console.log(fgbut)       
             
             
             answers = fgbut.data('answers').split(',').map(Number)
             activeatoms = fgbut.data('selectedAtoms').sort((a, b) => a - b)
-            console.log(activeatoms)
+            // console.log(activeatoms)
             
             if(activeatoms.includes(i)){
                 activeatoms.splice(activeatoms.indexOf(i), 1)
@@ -666,7 +679,7 @@
             // console.log("Selected atoms:")
             // console.log(fgbut.data('selectedAtoms'));
             
-            console.log(answers)
+            // console.log(answers)
 
             drawSelectedAtoms(activeatoms)
 
@@ -696,15 +709,15 @@
             let i = parseInt(t.classList[1].replace("bond-", ""))
             
             rotbbut = $(document).find(".rotbquestion.active")
-            console.log(rotbbut)       
+            // console.log(rotbbut)       
             
             
             answers = rotbbut.data('answers')
-            console.log("answers:")
-            console.log(answers)
+            // console.log("answers:")
+            // console.log(answers)
 
             activebonds = rotbbut.data('selectedBonds').sort((a, b) => a - b)
-            console.log(activebonds)
+            // console.log(activebonds)
             
             if(activebonds.includes(i)){
                 activebonds.splice(activebonds.indexOf(i), 1)
@@ -721,7 +734,7 @@
             }
             
             rotbbut.data('selectedBonds', activebonds.sort((a, b) => a - b))            
-            console.log(answers)
+            // console.log(answers)
             drawSelectedBonds(activebonds)
 
             if(activebonds.toString() === answers.toString()){
@@ -744,13 +757,13 @@
             // just an example
         }
         function move(e){
-            console.log(e.currentTarget);
+            // console.log(e.currentTarget);
             // just an example
         }
 
         function drawSelectedAtoms(activeatoms){
             let elements = Array.from(document.querySelectorAll('svg .atom-selector'))
-            console.log(elements)
+            // console.log(elements)
             elements.forEach(function(el) {
                 if(activeatoms.includes(parseInt(el.classList[1].replace('atom-', "")))){
                     el.style.fillOpacity = 0.5
@@ -765,7 +778,7 @@
         }
         function drawSelectedBonds(activebonds){
             let elements = Array.from(document.querySelectorAll('svg .bond-selector'))
-            console.log(elements)
+            // console.log(elements)
             elements.forEach(function(el) {
                 if(activebonds.includes(parseInt(el.classList[1].replace('bond-', "")))){
                     el.style.fillOpacity = 0.5
@@ -780,15 +793,15 @@
         }
         function checkanswer(e){
             answer = $(e.currentTarget).data('answer')
-            console.log(answer)
+            // console.log(answer)
             field = e.currentTarget.querySelector('input')
-            console.log(field)
+            // console.log(field)
             if (field.value == answer){
                 e.currentTarget.lastChild.innerHTML = "✔"
                 field.readOnly = true
                 e.currentTarget.classList.add("solved")
                 console.log("pka solved")
-                console.log(name)
+                // console.log(name)
                 $.ajax({
                     headers: { "X-CSRFToken": token },
                     url: 'pkasolvepost',
@@ -862,19 +875,19 @@
         function pkaquestion(estArray){
             let question = `<div class=pkaquestion data-answer='${estArray[1]}'> What's the estimated pka of the ${estArray[2]}? <input type=text/><text class='check'></text></div>`;
            
-            console.log(question)
+            // console.log(question)
             return question
         }
         function fgquestion(pair){
             tup = pair[1]
             tup.sort((a, b) => a - b)
-            console.log(tup)
+            // console.log(tup)
             let question = `<button type="button" class="fg" data-answers='${tup}'> Select the ${pair[0]} (${tup.length} atoms) </button>`;
             return question
         }
 
         function rotbquestion(rotbs){
-            console.log(rotbs)
+            // console.log(rotbs)
             rotbs.sort((a, b) => a - b)
             let question = `<button type="button" class="rotbquestion" data-answers='${JSON.stringify(rotbs)}'> Select the Rotatable Bonds (${rotbs.length} bonds)</button>`;
             return question
@@ -899,8 +912,8 @@
             })
             let rotb = Array.from(document.querySelectorAll('.rotbquestion'));
             rotb.forEach(function(rotb) {
-                console.log("checking rotb question")
-                console.log(rotb.classList)
+                // console.log("checking rotb question")
+                // console.log(rotb.classList)
                 allSolved = allSolved && rotb.classList.contains("solved")
 
             })

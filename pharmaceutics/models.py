@@ -102,6 +102,7 @@ class User(models.Model):
     Pkas_Solved = models.ManyToManyField(Molecule, related_name= "solvedpka_users", null = True)
     Maps_Solved = models.ManyToManyField(Molecule, related_name= "solvedmap_users", null = True)
     Rotbs_Solved = models.ManyToManyField(Molecule, related_name= "solvedrotb_users", null = True)
+    Qb2s_Solved = models.ManyToManyField(Molecule, related_name= "solvedqb2_users", null = True)
     def __str__(self):
         return self.Key
 

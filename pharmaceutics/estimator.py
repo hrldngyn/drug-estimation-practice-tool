@@ -457,6 +457,17 @@ def getRotatableBonds(m):
     print(matches)
     for tup in matches:
         bonds.append((m.GetBondBetweenAtoms(tup[0], tup[1])).GetIdx())
+    amide = Chem.MolFromSmarts("C(=O)-N")
+    amidematches = mol.GetSubstructMatches(amide)
+    print("THESE ARE AMIDES")
+    print(amidematches)
+    for tup in amidematches:
+        abond = (m.GetBondBetweenAtoms(tup[0], tup[2])).GetIdx()
+        print("amide bond" + str(abond))
+        if abond in bonds:
+            bonds.remove(abond)
+
+
     print("THESE ARE ROTB BONDS PASSED:")
     print(bonds)
     return bonds
