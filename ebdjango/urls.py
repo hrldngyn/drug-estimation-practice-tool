@@ -15,7 +15,7 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path
-from pharmaceutics.views import Pharm_Toys, manySVG, quiz1, quiz1post, quiz2, quiz2post, pkasolvepost, fgsolvepost, rotbsolvepost, mapmodesolvepost
+from pharmaceutics.views import Pharm_Toys, manySVG, quiz1, quiz1post, quiz2, quiz2post, pkasolvepost, fgsolvepost, rotbsolvepost, mapmodesolvepost, subjectivepost
 
 urlpatterns = [
     path('', Pharm_Toys, name="Pharm Toys"),
@@ -29,6 +29,8 @@ urlpatterns = [
     path('rotbsolvepost', rotbsolvepost, name="rotbincrement"),
     path('mapmodesolvepost', mapmodesolvepost, name="mapmodeincrement"),
     
+    path('subjectivepost', subjectivepost, name="subjectivepost"),
+
     path('admin/', admin.site.urls),
     path('pharmaceutics', Pharm_Toys, name="Pharm Toys"),
 

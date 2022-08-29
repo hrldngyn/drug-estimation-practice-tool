@@ -132,3 +132,9 @@ class Quiz2Attempt(models.Model):
     Answer3 = models.CharField(max_length=6, blank=False)
     Answer4 = models.CharField(max_length=6, blank=False)
     Answer5 = models.CharField(max_length=6, blank=False)
+
+class SubjectiveFeedback(models.Model):
+    User = models.ForeignKey("User", on_delete=models.CASCADE)
+    Molecule = models.ForeignKey("Molecule", on_delete=models.CASCADE)
+    Difficulty = models.CharField(max_length=18, blank=False, null=False)
+    QuestionBox = models.CharField(max_length=15, blank=False, null=False)

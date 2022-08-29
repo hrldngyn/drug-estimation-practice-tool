@@ -52,3 +52,7 @@ class Quiz1AttemptAdmin(admin.ModelAdmin):
 @admin.register(Quiz2Attempt)
 class Quiz2AttemptAdmin(admin.ModelAdmin):
     list_display = ['User', 'Timestamp', 'Secs_Taken', "Answer1", "Answer2", "Answer3", "Answer4", "Answer5"]
+
+@admin.register(SubjectiveFeedback)
+class SubjectiveFeedbackAdmin(admin.ModelAdmin):
+    list_display = ['User', 'Molecule', 'Difficulty']

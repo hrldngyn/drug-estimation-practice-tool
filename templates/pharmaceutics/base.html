@@ -209,7 +209,7 @@
                     <div id="feedback" class="initdis" style="visibility: none;">
                         <text style="text-align:center">How difficult was this question?</text>
                         <input type="range" min="0" max="4" value="2" class="slider" id="feedbackslider" style="height: 10px; padding: 5%; background-color: white;">
-                        <text id="difficulty" style="text-align:center">Medium</text>
+                        <input style="text-align:center; margin: 5px;" type="button" value="Medium" id="subjectivesubmit" onclick="subjectiveSubmit()"/>
                     </div>
                 </div>
 
@@ -902,6 +902,7 @@
                 allSolved = allSolved && rotb.classList.contains("solved")
 
             })
+            
             if(allSolved){
                 console.log("all Solved")
                 document.getElementById("questionbox1").classList.add("solved")
@@ -915,10 +916,28 @@
     <script> //feedback
         var slidernumber = document.getElementById("feedbackslider")
         const difficultysettings = ["Very Easy", "Easy", "Medium", "Difficult", "Very Difficult"]
-        difficulty = document.getElementById("difficulty")
+        difficulty = document.getElementById("subjectivesubmit")
 
         slidernumber.oninput = function() {
-            difficulty.innerHTML= difficultysettings[slidernumber.value];
+            difficulty.value = difficultysettings[slidernumber.value];
+        }
+
+        function subjectiveSubmit(qbname){
+            $.ajax({
+                    headers: { "X-CSRFToken": token },
+                    url: 'subjectivepost',
+                    type: 'post',
+                    data: {
+                        mol: name,
+                        difficulty: difficulty.value
+                        questionbox: qbname
+                    },
+                    success: function(response) {
+                        console.log('recorded subjective')
+                    }
+                })
+
+            difficulty.disabled = true
         }
     </script>
 </body>

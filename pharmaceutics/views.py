@@ -42,7 +42,7 @@ def Pharm_Toys(req):
         invertmolsvg = getRandomMap(req.GET['smiles'], maptag=req.GET['maptag'])
         rotbs = getRotatableBonds(m)
         try:
-            datamol = Molecule.objects.filter(Molecule_Name = req.GET['mol'])[0]
+            datamol = Molecule.objects.filter(Molecule_Name = req.GET['mol'].strip().capitalize())[0]
             # visited_drugs.append(datamol.Molecule_Name)
             litpka = datamol.LiteraturePka
             reference = datamol.Reference
@@ -188,25 +188,40 @@ def quiz2post(req):
 #pkasolvepost, fgsolvepost, rotbsolvepost, mapmodesolvepost
 def pkasolvepost(req):
     if req.method == "POST":
-        datamol = Molecule.objects.get(Molecule_Name = req.POST.get('mol'))
+        datamol = Molecule.objects.get(Molecule_Name = req.POST.get('mol').strip().capitalize())
         user = User.objects.get(Key = req.session.session_key)
         user.Pkas_Solved.add(datamol)
         return HttpResponse(status=200)
 def fgsolvepost(req):
     if req.method == "POST":
-        datamol = Molecule.objects.get(Molecule_Name = req.POST.get('mol'))
+        datamol = Molecule.objects.get(Molecule_Name = req.POST.get('mol').strip().capitalize())
         user = User.objects.get(Key = req.session.session_key)
         user.FGs_Solved.add(datamol)
         return HttpResponse(status=200)
 def rotbsolvepost(req):
     if req.method == "POST":
-        datamol = Molecule.objects.get(Molecule_Name = req.POST.get('mol'))
+        datamol = Molecule.objects.get(Molecule_Name = req.POST.get('mol').strip().capitalize())
         user = User.objects.get(Key = req.session.session_key)
         user.Rotbs_Solved.add(datamol)
         return HttpResponse(status=200)
 def mapmodesolvepost(req):
     if req.method == "POST":
-        datamol = Molecule.objects.get(Molecule_Name = req.POST.get('mol'))
+        datamol = Molecule.objects.get(Molecule_Name = req.POST.get('mol').strip().capitalize())
         user = User.objects.get(Key = req.session.session_key)
         user.Maps_Solved.add(datamol)
+        return HttpResponse(status=200)
+
+def subjectivepost(req):
+    if req.method == "POST":
+        datamol = Molecule.objects.get(Molecule_Name = req.POST.get('mol').strip().capitalize())
+        user = User.objects.get(Key = req.session.session_key)
+        difficulty = req.POST.get('difficulty')
+        questionbox = req.POST.get('questionbox')
+        sf = SubjectiveFeedback(
+            User = user,
+            Molecule = datamol,
+            Difficulty = difficulty,
+            QuestionBox = questionbox
+        )
+        sf.save()
         return HttpResponse(status=200)
