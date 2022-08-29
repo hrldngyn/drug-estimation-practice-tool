@@ -174,7 +174,7 @@
         if(desccheck.checked) {
             desc.style.display = 'contents';
         } else {
-            desc.style.display = 'none';
+            desc.style.display = 'none'; 
         }})
         // mapmodecheck.addEventListener('change', () => {
         // if(mapmodecheck.checked) {
@@ -373,7 +373,7 @@
                             props = JSON.parse(response.props)
                             console.log(props)
                             for (const [key, value] of Object.entries(props)) {
-                                $("#properties").append('<li>' + key + ": " + value);
+                                $("#properties").append('<li><h3>' + key + ": " + value+"</h3>");
                                 // $("#properties").append('<li>' + propquestion(props[i]))
                             }
 
