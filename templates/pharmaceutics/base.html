@@ -252,25 +252,28 @@
 
     <script type="text/javascript"> //3dmol stuff
 
-        document.getElementById('molecule-dropdown').addEventListener('change', handleSubmit)
+        document.getElementById('molecule-dropdown').addEventListener('change', () => {handleSubmit();})
 
         $("input[placeholder]").each(function() {
             $(this).attr('size', $(this).attr('placeholder').length);
             console.log("set placeholder width" + $(this).attr('placeholder').length)
         });
         document.getElementById('fname').addEventListener('keyup', styleSearch)
-
+        styleSearch()
         function styleSearch(e){
             if(document.getElementById('fname').value.length!=0){
                 document.getElementById('fname').style.outline = "5px dotted green"
                 document.getElementById('molecule-dropdown').style.outline = "0px"
             }
             else{
-                document.getElementById('fname').style.outline = "0px"
-                document.getElementById('molecule-dropdown').style.outline = "5px dotted green"
+                outlineDropdown()
             }
 
-        }   
+        } 
+        function outlineDropdown(){
+            document.getElementById('fname').style.outline = "0px"
+            document.getElementById('molecule-dropdown').style.outline = "5px dotted green"
+        }
         
 
 
