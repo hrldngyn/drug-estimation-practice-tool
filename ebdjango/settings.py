@@ -78,7 +78,7 @@ WSGI_APPLICATION = 'ebdjango.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'aws_drugtool',
+        'NAME': 'drugdb',
         'USER': 'harold',
         'PASSWORD': 'adminadminadmin',
         'HOST': 'drugdb.cyjtz4cfnu6t.us-west-2.rds.amazonaws.com',
