@@ -26,11 +26,11 @@ def Pharm_Toys(req):
         newuser.save()
 
     molecule_list = Molecule.objects.all()
-    num_drugs_viewed = req.session.get('num_drugs_viewed', 0)
-    num_pkas_solved = req.session.get('num_pkas_solved', 0)
-    num_fgs_solved = req.session.get('num_fgs_solved', 0)
-    num_rotbs_solved = req.session.get('num_rotbs_solved', 0)
-    num_maps_solved = req.session.get('num_maps_solved', 0)
+    # num_drugs_viewed = req.session.get('num_drugs_viewed', 0)
+    # num_pkas_solved = req.session.get('num_pkas_solved', 0)
+    # num_fgs_solved = req.session.get('num_fgs_solved', 0)
+    # num_rotbs_solved = req.session.get('num_rotbs_solved', 0)
+    # num_maps_solved = req.session.get('num_maps_solved', 0)
     if req.headers.get('x-requested-with') == 'XMLHttpRequest':
         # Scraper()
         print("attempting svg get")
