@@ -74,18 +74,26 @@ WSGI_APPLICATION = 'ebdjango.wsgi.application'
 
 # Database
 # https://docs.djangoproject.com/en/3.1/ref/settings/#databases
-
+if 'RDS_HOSTNAME' in os.environ:
+    DATABASES = {
+        'default': {
+            'NAME': os.environ['RDS_DB_NAME'],
+            'USER': os.environ['RDS_USERNAME'],
+            'PASSWORD': os.environ['RDS_PASSWORD'],
+            'HOST': os.environ['RDS_HOSTNAME'],
+            'PORT': os.environ['RDS_PORT'],
+        }
+    }
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'drugtooldb',
+        'NAME': 'ebdb',
         'USER': 'harold',
         'PASSWORD': 'adminadminadmin',
-        'HOST': 'drugtooldb.cyjtz4cfnu6t.us-west-2.rds.amazonaws.com',
+        'HOST': 'awseb-e-2avvz2chqc-stack-awsebrdsdatabase-uejyewuzkdet.cyjtz4cfnu6t.us-west-2.rds.amazonaws.com',
         'PORT': '3306',
     }
 }
-
 
 # Password validation
 # https://docs.djangoproject.com/en/3.1/ref/settings/#auth-password-validators
