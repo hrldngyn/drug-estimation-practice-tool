@@ -141,7 +141,7 @@ def manySVG(req):
                 Time= req.GET['timestamp'], 
                 MapMode=False
             )
-            q.save()
+            # q.save()
 
 
 
