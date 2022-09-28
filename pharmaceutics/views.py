@@ -18,13 +18,15 @@ def Pharm_Toys(req):
     # if req.session.test_cookie_worked():
     #     req.session.delete_test_cookie()
     #     return HttpResponse("You're logged in.")
-    if not req.session.session_key:
+    
+    if not req.session.exists(req.session.session_key):
+        print("making session")
         req.session.create()
     if(not User.objects.filter(Key = req.session.session_key).exists()):
         print("making a user")
-        newuser = User(Key = req.session.session_key)
-        newuser.save()
+        User.objects.create(Key = req.session.session_key)
 
+    print(req.session.session_key)
     molecule_list = Molecule.objects.all()
     # num_drugs_viewed = req.session.get('num_drugs_viewed', 0)
     # num_pkas_solved = req.session.get('num_pkas_solved', 0)
@@ -60,6 +62,7 @@ def Pharm_Toys(req):
 
         #save the query
         user=User.objects.get(Key = req.session.session_key)
+        print(user)
         mode = req.GET['mapmodecheck'] == "true"
         q = Query(
             User=user,
@@ -67,7 +70,7 @@ def Pharm_Toys(req):
             Time= req.GET['timestamp'], 
             MapMode=mode
         )
-        q.save()
+        # q.save()
 
         iontype = datamol.Ion_Type
 
