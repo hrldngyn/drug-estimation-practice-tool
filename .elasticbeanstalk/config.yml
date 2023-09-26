@@ -3,7 +3,7 @@ branch-defaults:
     environment: null
     group_suffix: null
   main:
-    environment: drugtool-env
+    environment: molint
     group_suffix: null
 environment-defaults:
   django-env:

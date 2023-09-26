@@ -90,7 +90,7 @@ DATABASES = {
         'NAME': 'ebdb',
         'USER': 'harold',
         'PASSWORD': 'adminadminadmin',
-        'HOST': 'awseb-e-2avvz2chqc-stack-awsebrdsdatabase-cz5jzuuiipuo.cyjtz4cfnu6t.us-west-2.rds.amazonaws.com',
+        'HOST': 'molint.eba-qcmrhn7u.us-west-2.elasticbeanstalk.com',
         'PORT': '3306',
     }
 }

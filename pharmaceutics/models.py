@@ -94,8 +94,8 @@ class Protein(models.Model):
     def __str__(self):
         return self.Name
 
-
 class User(models.Model):
+    id = models.BigAutoField(primary_key=True)
     Key = models.CharField(max_length=40, blank=False)
     FGs_Solved = models.ManyToManyField(Molecule, related_name= "solvedfg_users", null = True)
     Pkas_Solved = models.ManyToManyField(Molecule, related_name= "solvedpka_users", null = True)
