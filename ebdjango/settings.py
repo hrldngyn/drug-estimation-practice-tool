@@ -26,7 +26,7 @@ SECRET_KEY = '546&k-=o$965c_238ick4=ck0!q57eny&qt2#u+)@i3vxl-=yh'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['molint.eba-qcmrhn7u.us-west-2.elasticbeanstalk.com', '127.0.0.1']
+ALLOWED_HOSTS = ['molint.eba-qcmrhn7u.us-west-2.elasticbeanstalk.com', '127.0.0.1', '.vercel.app']
 
 
 # Application definition
@@ -86,12 +86,8 @@ if 'RDS_HOSTNAME' in os.environ:
     }
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'ebdb',
-        'USER': 'harold',
-        'PASSWORD': 'adminadminadmin',
-        'HOST': 'molint.eba-qcmrhn7u.us-west-2.elasticbeanstalk.com',
-        'PORT': '3306',
+        'ENGINE': 'django.db.backends.sqlite3',
+        'NAME': BASE_DIR / 'db.sqlite3',
     }
 }
 
